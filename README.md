@@ -15,8 +15,8 @@ An interactive command-line interface for interacting with DeepSeek's AI models,
 
 1. Clone the repository:
 ```bash
-git clone <your-repository-url>
-cd <repository-directory>
+git clone https://github.com/luismsandoval/deepseek-cli.git
+cd deepseek-cli
 ```
 
 2. Install dependencies:
