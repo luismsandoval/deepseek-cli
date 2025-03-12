@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Please install dependencies first: `pip install openai rich python-dotenv`
 
 from openai import OpenAI
@@ -72,6 +73,11 @@ DEFAULT_PARAMS = {
         "value": "deepseek-reasoner",
         "help": "Model to use",
         "type": str
+    },
+    "system_message": {
+        "value": "You are a helpful assistant, focused on the field of AI and machine learning, sort of like my personal programming tutor.",
+        "help": "System message that defines the assistant's behavior and knowledge",
+        "type": str
     }
 }
 
@@ -98,6 +104,8 @@ def setup_args():
                         help=DEFAULT_PARAMS["base_url"]["help"])
     parser.add_argument('--model', type=str, default=DEFAULT_PARAMS["model"]["value"],
                         help=DEFAULT_PARAMS["model"]["help"])
+    parser.add_argument('--system_message', type=str, default=DEFAULT_PARAMS["system_message"]["value"],
+                        help=DEFAULT_PARAMS["system_message"]["help"])
     
     # UI flag
     parser.add_argument('--no-interactive', action='store_true',
@@ -425,20 +433,20 @@ def main():
     
     # Initialize the conversation with the system message
     messages = [
-        {"role": "system", "content": "You are a helpful assistant, focused on the field of AI and machine learning, sort of like my personal programming tutor."}
+        {"role": "system", "content": params["system_message"]}
     ]
     
     # Display welcome message and instructions
     console.print(Panel.fit(
         f"[bold blue]DeepSeek Reasoner CLI[/bold blue] - [yellow]Model: {params['model']}[/yellow]",
-        subtitle="Type 'exit' to end the conversation, 'params' to edit parameters, 'history' to view conversation",
+        subtitle="Type 'exit' to end the conversation, 'params' to edit parameters, 'system' to edit system message, 'history' to view conversation",
         border_style="blue"
     ))
     
     # Main conversation loop
     while True:
         # Display parameter edit prompt and message input in different colors
-        console.print("\n[bold cyan]Enter your message[/bold cyan] ([italic]Type 'params' to edit parameters, 'history' to view conversation, or 'exit' to quit[/italic]):")
+        console.print("\n[bold cyan]Enter your message[/bold cyan] ([italic]Type 'params' to edit parameters, 'system' to edit system message, 'history' to view conversation, or 'exit' to quit[/italic]):")
         user_input = Prompt.ask("")
         
         # Check for special commands
@@ -447,6 +455,14 @@ def main():
             break
         elif user_input.lower() == 'params':
             params = edit_parameters(params)
+            continue
+        elif user_input.lower() == 'system':
+            current_system = messages[0]["content"]
+            console.print(f"\n[bold magenta]Current system message:[/bold magenta]\n{current_system}")
+            new_system = Prompt.ask("\n[bold magenta]Enter new system message[/bold magenta]", default=current_system)
+            messages[0]["content"] = new_system
+            params["system_message"] = new_system
+            console.print("[green]System message updated successfully![/green]")
             continue
         elif user_input.lower() == 'history':
             display_history(messages)

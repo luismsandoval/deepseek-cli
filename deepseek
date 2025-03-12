@@ -1,0 +1,12 @@
+#!/bin/bash
+# Wrapper script for deepseek-cli
+# This script changes to the deepseek-cli directory before running the r1.py script
+
+# Get the directory where this script is located (even if it's a symlink)
+SCRIPT_DIR="$( cd "$( dirname "$(readlink -f "${BASH_SOURCE[0]}")" )" && pwd )"
+
+# Change to the script directory
+cd "$SCRIPT_DIR"
+
+# Run the original Python script with all arguments passed to this script
+python3 r1.py "$@"
